@@ -5,12 +5,13 @@ namespace App\Filament\Resources\Supply\SupplierResource\RelationManagers;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
+use App\Enums\Departments;
 use Filament\Tables\Table;
+use Filament\Forms\FormsComponent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Resources\RelationManagers\RelationManager;
 use App\Filament\Resources\Supply\SupplierContactResource\Pages\CreateSupplierContact;
-use Filament\Forms\FormsComponent;
 
 class ContactsRelationManager extends RelationManager
 {
@@ -23,25 +24,32 @@ class ContactsRelationManager extends RelationManager
                 Forms\Components\Select::make('supplier_id')
                 ->relationship('supplier', 'name')
             ->visible(fn ($livewire) => $livewire instanceof CreateSupplierContact)
-                    ->required(),
+                    ->required()
+                    ->label('Fournisseur'),
                 Forms\Components\TextInput::make('first_name')
-                ->required()
-                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(30)
+                    ->label('Prénom'),
                 Forms\Components\TextInput::make('last_name')
-                ->required()
-                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(30)
+                    ->label('Nom'),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
-                    ->maxLength(255),
+                    ->maxLength(15)
+                    ->label('Téléphone'),
                 Forms\Components\TextInput::make('mobile')
                     ->tel()
-                    ->maxLength(255),
+                    ->maxLength(15)
+                    ->label('Mobile'),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('department')
-                ->maxLength(255),
+                    ->maxLength(100),
+                Forms\Components\Select::make('department')
+                    ->options(Departments::class),
+                Forms\Components\MarkDownEditor::make('description')
+                    ->columnSpanFull()
                 
             ]);
             
@@ -52,9 +60,6 @@ class ContactsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('first_name')
             ->columns([
-            Tables\Columns\TextColumn::make('supplier.name')
-                ->numeric()
-                ->sortable(),
             Tables\Columns\TextColumn::make('first_name')
                 ->searchable(),
             Tables\Columns\TextColumn::make('last_name')

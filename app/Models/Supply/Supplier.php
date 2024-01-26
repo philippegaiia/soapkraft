@@ -17,16 +17,26 @@ class Supplier extends Model
         'name',
         'code',
         'slug',
-        'address',
+        'address1',
+        'address2',
+        'is_active',
         'zipcode',
+        'city',
         'country',
         'email',
         'phone',
-        'description'
+        'website',
+        'description',
+        'customer_code'
     ];
 
     public function contacts(): HasMany
     {
         return $this->hasMany(SupplierContact::class, 'supplier_id');
     }
+
+    public function supplier_listings(): HasMany
+    {
+        return $this->hasMany(SupplierListing::class);
+    }   
 }

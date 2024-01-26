@@ -5,6 +5,10 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Database\Seeders\SupplierListingSeeder;
+use Database\Seeders\Supply\SupplierSeeder;
+use Database\Seeders\Supply\IngredientSeeder;
+use Database\Seeders\Supply\IngredientCategorySeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,28 +30,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // seed suppliers
-        DB::table('suppliers')->insert([
-            //Global Admin
-            [
-                'name' => 'Cauvin',
-                'code' => 'CAU',
-            ],
-            [
-                'name' => 'Rosier Davennes',
-                'code' => 'RDA',
-                
-            ],
-            [
-                'name' => 'Actibio',
-                'code' => 'ACT',
-
-            ],
-            [
-                'name' => 'Olisud',
-                'code' => 'OLI',
-
-            ],
-        ]);
+        $this->call(SupplierSeeder::class);
 
         // seed contacts
 
@@ -71,6 +54,11 @@ class DatabaseSeeder extends Seeder
                 'email' => 'cecilie@cauvin.com',
             ],
         ]);
+
+
+        $this->call(IngredientCategorySeeder::class);
+        $this->call(IngredientSeeder::class);
+        $this->call(SupplierListingSeeder::class);
 
 
         

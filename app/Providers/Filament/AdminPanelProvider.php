@@ -48,6 +48,7 @@ class AdminPanelProvider extends PanelProvider
                 'Produits Finis',
                 'Gestion Utilisateurs'
             ])
+            ->sidebarCollapsibleOnDesktop()
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

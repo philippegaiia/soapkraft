@@ -1,0 +1,14 @@
+
+[
+{"id":1, "parent_id":null, "code":"OB","name":"Huiles et beurres", "slug":"huiles-et-beurres", "is_visible":true, "deleted_at":null,"created_at":"2020-12-27 06:33:00","updated_at":"2020-12-27 07:08:45"},
+{"id":2, "parent_id":null, "code":"EO","name":"Huiles essentielles", "slug":"huiles-essentielles", "is_visible":true, "deleted_at":null,"created_at":"2020-12-27 06:34:04","updated_at":"2020-12-27 07:21:55"},
+{"id":3, "parent_id":null, "code":"BE","name":"Extraits végétaux", "slug":"extraits-vegetaux", "is_visible":true, "deleted_at":null,"created_at":"2020-12-27 06:34:59","updated_at":"2020-12-27 07:42:23"},
+{"id":4, "parent_id":null, "code":"FR","name":"Parfums et arômes", "slug":"parfums-aromes", "is_visible":true, "deleted_at":null,"created_at":"2020-12-27 06:35:31","updated_at":"2020-12-27 07:28:12"},
+{"id":5, "parent_id":null, "code":"EC","name":"Terres et argiles", "slug":"terres-argiles", "is_visible":true, "deleted_at":null,"created_at":"2020-12-27 06:37:01","updated_at":"2020-12-27 07:45:27"},
+{"id":6, "parent_id":null, "code":"FA","name":"Acides gras", "slug":"acides-gras", "is_visible":true, "deleted_at":null,"created_at":"2020-12-27 06:44:40","updated_at":"2020-12-27 07:21:21"},
+{"id":7, "parent_id":null, "code":"CO","name":"Colorants", "slug":"colorants", "is_visible":true, "deleted_at":null,"created_at":"2020-12-27 06:51:24","updated_at":"2020-12-27 07:46:26"},
+{"id":8, "parent_id":null, "code":"CH","name":"Produits chimiques auxiliaires", "is_visible":true, "slug":"chimie", "deleted_at":null,"created_at":"2020-12-27 06:52:06","updated_at":"2020-12-27 07:46:41"},
+{"id":9, "parent_id":null, "code":"PK","name":"Packaging", "slug":"packaging", "is_visible":true, "deleted_at":null,"created_at":"2020-12-27 06:52:45","updated_at":"2020-12-27 07:45:58"},
+{"id":10, "parent_id":null, "code":"WA","name":"Cires", "slug":"cires", "is_visible":true, "deleted_at":null,"created_at":"2020-12-27 07:02:49","updated_at":"2020-12-27 07:36:03"},
+{"id":11, "parent_id":null, "code":"GY","name":"Glycols", "slug":"glycols", "is_visible":true, "deleted_at":null,"created_at":"2020-12-27 08:30:10","updated_at":"2020-12-27 08:30:10"}
+]

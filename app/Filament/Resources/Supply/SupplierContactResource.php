@@ -2,22 +2,31 @@
 
 namespace App\Filament\Resources\Supply;
 
-use App\Filament\Resources\Supply\SupplierContactResource\Pages;
-use App\Filament\Resources\Supply\SupplierContactResource\RelationManagers;
-use App\Models\Supply\SupplierContact;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
+use App\Enums\Departments;
+//use Filament\Actions\ActionGroup;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Models\Supply\SupplierContact;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\Supply\SupplierContactResource\Pages;
+use App\Filament\Resources\Supply\SupplierContactResource\RelationManagers;
 
 class SupplierContactResource extends Resource
 {
     protected static ?string $model = SupplierContact::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Achats';
+
+    protected static ?string $navigationLabel = 'Contacts Fournisseurs';
+
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -42,8 +51,8 @@ class SupplierContactResource extends Resource
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('department')
-                    ->maxLength(255),
+                Forms\Components\Select::make('department')
+                    ->options(Departments::class),
                 Forms\Components\MarkDownEditor::make('description')
             ]);
     }
@@ -80,10 +89,14 @@ class SupplierContactResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                     Tables\Actions\EditAction::make(),
+                     Tables\Actions\EditAction::make(),
+                ])
+               
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
