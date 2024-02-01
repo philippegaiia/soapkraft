@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Supply;
 
 use Filament\Forms;
 use Filament\Tables;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -12,6 +14,7 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Forms\FormsComponent;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\Split;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
@@ -43,40 +46,39 @@ class SupplierResource extends Resource
                 ->schema([
                     Forms\Components\Section::make('Détails Fournisseur')
                         ->schema([
-                            Forms\Components\TextInput::make('name')
+                            TextInput::make('name')
                                 ->label('Raison Sociale')
                                 ->required()
-                                ->maxLength(50)
+                                ->maxLength(100)
                                 ->live(onBlur: true)
-                               
-                                ->afterStateUpdated(function(string $operation, $state,  Forms\Set $set) {
-                                   
-                                    if ($operation !== 'create') {
+                                ->afterStateHydrated(function (TextInput $component, ?string $state) {
+                                    $component->state(ucwords($state));
+                                })
+                                ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state, ?string $operation,) {
+                                    if ($get('slug') === null) {
+                                        $set('slug', Str::slug($state));
                                         return;
-                                    }
-                                    
-
-                                    $set('slug', Str::slug($state));
-                                    })
+                                    }                         
+                                })                                  
                                 ->unique(Supplier::class, 'name', ignoreRecord: true)
                                 ->columnSpan(3),
                                 
-                            Forms\Components\TextInput::make('slug')
+                            TextInput::make('slug')
+                                //->disabledOn('edit')
                                 ->label('Slug')
-                                ->required()
-                                //->disabled()
+                                ->required()                              
                                 ->dehydrated()
-                                ->unique(Supplier::class,'slug', ignoreRecord: true)
+                                ->unique(ignoreRecord: true)
                                 ->maxLength(100)
                                 ->columnSpan(3),
 
-                            Forms\Components\TextInput::make('code')
+                            TextInput::make('code')
                                 ->required()
                                 ->unique(Supplier::class, 'code', ignoreRecord: true)
                                 ->maxLength(3)
                                  ->columnSpan(2),
 
-                            Forms\Components\TextInput::make('Customer_code')
+                            TextInput::make('Customer_code')
                                 ->label('Code Client')
                                 ->maxLength(100)
                                 ->columnSpan(2),
@@ -86,40 +88,41 @@ class SupplierResource extends Resource
                                 ->inline(false)
                                 ->columnSpan(2),
 
-                            Forms\Components\TextInput::make('address1')
+                            TextInput::make('address1')
                                 ->label('Adresse')
                                 ->maxLength(100)
                                 ->columnSpan(3),
 
-                            Forms\Components\TextInput::make('address2')
+                            TextInput::make('address2')
                                 ->label('Complément d\'adresse')
                                 ->maxLength(100)
                                 ->columnSpan(3),
 
-                            Forms\Components\TextInput::make('zipcode')
+                            TextInput::make('zipcode')
                                 ->label('Code Postal')
                                 ->maxLength(10)
                                 ->columnSpan(2),
 
-                            Forms\Components\TextInput::make('country')
+                            TextInput::make('country')
                                 ->label('Pays')
                                 ->maxLength(255)
                                 ->columnSpan(4),
 
-                            Forms\Components\TextInput::make('email')
+                            TextInput::make('email')
                                 ->email()
                                 ->maxLength(100)
                                 ->columnSpan(2),
 
-                            Forms\Components\TextInput::make('phone')
+                            TextInput::make('phone')
                                 ->tel()
+                                ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
                                 ->label('Téléphone')
                                 ->maxLength(15)
                                 ->columnSpan(2),
 
-                            Forms\Components\TextInput::make('Site Internet')
-                                ->tel()
-                                ->maxLength(15)
+                            TextInput::make('Site Internet')
+                                ->url()
+                                ->maxLength(100)
                                 ->columnSpan(2),
                             ])->columns(6),
                             
@@ -146,35 +149,47 @@ class SupplierResource extends Resource
                     ->label('Raison Sociale')
                     ->sortable()
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('address1')
                     ->label('Adresse')  
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                    
+
                 Tables\Columns\TextColumn::make('address2')
                     ->label('Complément d\'adresse')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('zipcode')
                     ->label('Code Postal')
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('country')
                     ->label('Pays')
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('phone')
                     ->label('Téléphone')
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('website')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('actif')
-                    ->label('Actif')
-                    ->searchable(),           
+
+                Tables\Columns\IconColumn::make('is_active')
+                    ->boolean()
+                    ->sortable(),
+           
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -185,15 +200,15 @@ class SupplierResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
-                 Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\DeleteAction::make()
                 ->action(function ($data, $record) {
-                    if ($record->contacts()->count() > 0) {
+                    if ($record->contacts()->count() > 0 || $record->supplier_listings()->count() > 0) {
                         Notification::make()
                             ->danger()
-                            ->title('Fournisseur est utilisé')
-                            ->body('Ce fournisseurs a des contacts. Supprimez leq contacts avant d effacer ce forunisseur .')
+                            ->title('Opération Impossible')
+                            ->body('Supprimez les fichiers liés à ce fournisseur pour le supprimer.')
                             ->send();
 
                         return;
@@ -214,7 +229,7 @@ class SupplierResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                   // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -222,7 +237,8 @@ class SupplierResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\ContactsRelationManager::class,
+            RelationManagers\SupplierListingsRelationManager::class, 
+            RelationManagers\ContactsRelationManager::class,     
         ];
     }
 
@@ -235,21 +251,26 @@ class SupplierResource extends Resource
                    Section::make('Détails Fournisseur')
                     ->schema([
                         TextEntry::make('name')
-                            ->label('Raison Sociale'),
+                            ->label('Raison Sociale')
+                            ->columnSpan(2),
 
-                        TextEntry::make('code'),
+                        TextEntry::make('code')
+                            ->columnSpan(1),
 
-                         TextEntry::make('customer_code'),
+                        TextEntry::make('customer_code')
+                            ->columnSpan(1),
 
                         TextEntry::make('address1')
                             ->label('Adresse'),
                             
-                        TextEntry::make('address1')
-                            ->label('Adresse Complément')
-                            ->columnSpan('full'),
+                        TextEntry::make('address2')
+                            ->label('Adresse Complément'),                     
 
                         TextEntry::make('zipcode')
                             ->label('Code Postal'),
+
+                        TextEntry::make('city')
+                            ->label('VIlle'),
 
                         TextEntry::make('country')
                             ->label('Pays'),
@@ -261,17 +282,19 @@ class SupplierResource extends Resource
 
                         TextEntry::make('website')
                         ->label('Site Internet'),
-                    ])->columns(3),
+
+                    ])->columns(4),
                 
                     Section::make('Notes')
+                        ->collapsed()
                         ->schema([
                             TextEntry::make('description')
-                            ->label('')
+                                ->label('')
                                 ->markdown()
-                                ->prose(),
+                                ->prose()
+                                
                         ]),
-                    ]);
-                          
+                    ]);                         
         
     }
 

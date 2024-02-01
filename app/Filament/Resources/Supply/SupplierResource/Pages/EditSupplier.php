@@ -18,16 +18,15 @@ class EditSupplier extends EditRecord
         return [
             Actions\DeleteAction::make()
                 ->action(function ($data, $record) {
-                    if ($record->contacts()->count() > 0) {
-                        Notification::make()
-                            ->danger()
-                            ->title('Fournisseur est utilisé')
-                            ->body('Ce fournisseurs a des contacts. Supprimez leq contacts avant d effacer ce forunisseur .')
-                            ->send();
+                if ($record->contacts()->count() > 0 || $record->supplier_listings()->count() > 0) {
+                    Notification::make()
+                        ->danger()
+                        ->title('Opération Impossible')
+                        ->body('Supprimez les fichiers liés à ce fournisseur pour le supprimer.')
+                        ->send();
 
-                        return;
-                    }
-
+                    return;
+                }
                     Notification::make()
                         ->success()
                         ->title('Fournisseur Supprimé')

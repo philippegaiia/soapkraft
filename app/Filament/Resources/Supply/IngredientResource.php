@@ -17,7 +17,13 @@ class IngredientResource extends Resource
 {
     protected static ?string $model = Ingredient::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Achats';
+
+    protected static ?string $navigationLabel = 'Ingrédients';
+
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
@@ -25,6 +31,7 @@ class IngredientResource extends Resource
             ->schema([
                 Forms\Components\Select::make('ingredient_category_id')
                     ->relationship('ingredient_category', 'name')
+                    ->native(false)
                     ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()

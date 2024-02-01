@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use App\Enums\Departments;
 use Filament\Tables\Table;
 use Filament\Forms\FormsComponent;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -80,12 +81,15 @@ class ContactsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ActionGroup::make ([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(), 
+                ])
+                
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
