@@ -17,6 +17,7 @@ class SupplierListingsRelationManager extends RelationManager
 {
     protected static string $relationship = 'supplier_listings';
 
+
     public function form(Form $form): Form
     {
         return $form

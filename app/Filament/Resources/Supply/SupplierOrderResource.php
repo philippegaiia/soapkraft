@@ -2,32 +2,41 @@
 
 namespace App\Filament\Resources\Supply;
 
+
 use Filament\Forms;
+use Illuminate\Validation\Rule;
 use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use App\Enums\OrderStatus;
 use Filament\Tables\Table;
+use App\Models\Supply\Supply;
+use App\Models\Supply\Supplier;
 use Filament\Resources\Resource;
 use App\Models\Supply\SupplierOrder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Wizard;
 use App\Models\Supply\SupplierListing;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
 use App\Models\Supply\SupplierOrderItem;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\MarkdownEditor;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\Supply\SupplierOrderResource\Pages;
 use App\Filament\Resources\Supply\SupplierOrderResource\RelationManagers;
-use App\Models\Supply\Supplier;
 
 class SupplierOrderResource extends Resource
 {
@@ -50,32 +59,78 @@ class SupplierOrderResource extends Resource
                         ->schema([
                             Select::make('supplier_id')
                                 ->relationship('supplier', 'name')
+                                ->disabledOn('edit')    
+                                -> afterStateUpdated(function (Get $get, Set $set, ?string $state, $record)
+                                {
+                                    $prefix = now()->year;  
+                                    $supplierCode = Supplier::findOrFail($state)->code;
+                                    $serie = $get('serial_number');
+                                                                       
+                                    $set('order_ref', $prefix.'-'.$supplierCode.'-'.$serie);
+                                })
                                 ->native(false)
-                                ->required(),
-                            TextInput::make('serial_number')
-                                ->maxLength(255)
-                                ->unique(SupplierOrder::class, ignoreRecord: true)
-                                ->default(1),
-                            Select::make('order_status')
-                                ->options(OrderStatus::class)
-                                ->native(false),
-                            TextInput::make('order_ref')
-                                ->maxLength(255),
-                            DatePicker::make('order_date')
                                 ->required()
-                                ->default(now()),
-                            DatePicker::make('delivery_date'),
-                            TextInput::make('confirmation_number')
-                                ->maxLength(255),
-                            TextInput::make('invoice_number')
-                                ->maxLength(255),
-                            TextInput::make('bl_number')
-                                ->maxLength(255),
+                                ->columnSpan(2),
+
+                            TextInput::make('serial_number')
+                                //->hidden()
+                                ->disabledOn('edit')
+                                ->numeric()
+                                ->default(function () {
+                                    $serie = (SupplierOrder::all()->max('serial_number') ?? 0 )+ 1;
+                                    $serie = str_pad($serie, 4, '0', STR_PAD_LEFT);
+                                    return $serie;
+                                })
+                                ->dehydrated()
+                                ->unique(SupplierOrder::class, ignoreRecord: true)
+                                ->required(fn (string $operation): bool => $operation === 'create')
+                                ,
+                                TextInput::make('order_ref')
+                                ->maxLength(255)
+                                ->disabled()
+                                ->dehydrated(),
+                            
+                            
+                                ToggleButtons::make('order_status')
+                                ->options(OrderStatus::class)
+                                ->inline()
+                                ->default('draft')
+                                ->columnSpan(4),
+
+
+                            Fieldset::make('Dates')
+                                ->schema([
+                                    DatePicker::make('order_date')
+                                    ->required()
+                                    ->default(now()),
+                                    DatePicker::make('delivery_date'),
+                                ])->columnSpanFull(),                       
+                            
+                            Fieldset::make('Documents')
+                                ->schema([
+                                    TextInput::make('confirmation_number')
+                                        ->maxLength(255)
+                                        ->columnSpan(1),
+                                    TextInput::make('invoice_number')
+                                        ->maxLength(255)
+                                        ->columnSpan(1),
+                                    TextInput::make('bl_number')
+                                        ->maxLength(255)
+                                        ->columnSpan(1),
+                                ])->columns(3),
+                                                  
                             TextInput::make('freight_cost')
                                 ->numeric(),
-                            MarkdownEditor::make('description')
-                                ->columnSpanFull(),
-                        ])->columns(2),
+
+                            Section::make('Informations sur la Commande')
+                            ->description('The items you have selected for purchase')
+                                ->schema([
+                                    MarkdownEditor::make('description')                               
+                                ])
+                                ->collapsed()
+                                ->columnSpanFull()
+                           
+                        ])->columns(4),
                         
                     Forms\Components\Wizard\Step::make('Items')
                         ->schema([
@@ -86,18 +141,15 @@ class SupplierOrderResource extends Resource
                                         ->relationship(
                                             name: 'supplier_listing', 
                                             titleAttribute: 'name',
-                                            modifyQueryUsing: fn (Builder $query, $record, Get $get): Builder => $query->where('supplier_id', $get('../../supplier_id')),
+                                            modifyQueryUsing: fn (Builder $query, Get $get): Builder => $query->where('supplier_id', $get('../../supplier_id')),
                                         )
-                                        // ->options()
                                         ->live()
-                                       ->afterStateUpdated(function ($state, Get $get, Set $set, ) {
-                                            $supplier_listing_id = $get('supplier_listing_id');
-                                            $supplier_listing = SupplierListing::find($state);
-                                            $set('unit_weight', $supplier_listing->unit_weight);
-                                        }) 
-                                       /*  ->afterStateUpdated(fn ($state, Set $set) => $set('unit_weight', SupplierListing::find($state)?->unit_weight ?? 0))*/
-                                       ->preload() 
-                                       ->required()
+                                        ->afterStateUpdated(function ($state, Get $get, Set $set, ) {
+                                                $supplier_listing = SupplierListing::find($state);
+                                                $set('unit_weight', $supplier_listing->unit_weight);
+                                            }) 
+                                        ->preload() 
+                                        ->required()
                                         ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                         ->native(false)
                                         ->columnSpan(3)
@@ -107,37 +159,77 @@ class SupplierOrderResource extends Resource
                                         ->numeric()
                                         ->live()
                                         ->dehydrated()
-                                        ->default(1),
+                                        ->default(1)
+                                        ->columnSpan(1),
 
                                     TextInput::make('unit_weight')
-                                        ->label('Poids Unitaire')
+                                        ->label('Poids')
                                         ->disabled()
                                         ->dehydrated()
-                                        ->default(1),
-                                        //->numeric()
-                                        //->required(),
-                                    
+                                        ->default(1)
+                                        ->columnSpan(1),
 
                                     TextInput::make('unit_price')
-                                        ->label('Prix Unitaire')
-                                        ->dehydrated()
-                                        // ->default(1)
-                                        ->numeric(),
-                                        //->required(),
+                                        ->label('Prix')
+                                       // ->dehydrated()
+                                        ->numeric()
+                                        ->columns(1),
+
+                                    TextInput::make('batch_number')
+                                        ->label('No. Lot')
+                                        ->live()
+                                        ->unique(SupplierOrderItem::class, ignoreRecord: true)
+                                        ->columnSpan(1),
+
+                                    DatePicker::make('expiry_date')
+                                        ->label('DLUO')
+                                        //->format('d/m/Y')
+                                        ->native(false)
+                                        ->closeOnDateSelection()
+                                        ->columnSpan(1),
 
                                     Placeholder::make('total_quantity')
-                                        ->label('Quantité Totale')
+                                        ->label('Quantité')
                                         ->content(function ($get) {
                                             return $get('quantity') * $get('unit_weight');
-                                        })
-                                ])->columns(7)
-                        ])
+                                        })->columnSpan(1),
 
-                    ])->columnSpanFull()
-                
-                    
-                        ]);
-            
+                                    Checkbox::make('is_in_supplies')
+                                        ->label('En Stock')
+                                        //->isReadOnly()
+                                        ->inline(false)
+                                        ->columnSpan(1),
+
+                                ])->columns(10)->defaultItems(0) 
+                                    ->extraItemActions([
+                                        Action::make('createNewInventory')
+                                            ->icon('heroicon-m-envelope')
+                                            ->action(function (array $arguments, Repeater $component, Set $set, $record, Supply $supply): void {
+                                                $itemData = $component->getItemState($arguments['item']);
+                                                 
+                                             $supply->supplier_listing_id = $itemData['supplier_listing_id'];
+                                             $supply->order_ref = $record->order_ref;
+                                             $supply->save();
+
+                                             Notification::make()
+                                              ->title('Nouvelle entrée en stock')
+                                              ->success()
+                                              ->send();
+
+                                            $set('../is_in_supplies', true);
+                                            $state = $component->getState();
+                                            dd($itemData['item']);
+
+
+                                           /* Supply::create([
+                                                'supplier_listing_id' => $itemData['supplier_listing_id'],
+                                                'order_ref' => $record->order_ref,
+                                            ]);*/
+                                            })
+                                        ])
+                                    ]),
+                    ])->columnSpanFull()     
+                ]);         
     }
 
     public static function table(Table $table): Table
@@ -147,7 +239,8 @@ class SupplierOrderResource extends Resource
                 Tables\Columns\TextColumn::make('supplier.name')
                     ->label('Fournisseur')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
 
                 Tables\Columns\TextColumn::make('order_status')
                     ->label('Statut')
@@ -201,9 +294,11 @@ class SupplierOrderResource extends Resource
             ->filters([
                // Tables\Filters\TrashedFilter::make(),
             ])
+
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
+
             ->bulkActions([
                Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -239,5 +334,10 @@ class SupplierOrderResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('list');
     }
 }

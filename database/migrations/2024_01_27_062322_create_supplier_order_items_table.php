@@ -18,8 +18,11 @@ return new class extends Migration
             $table->foreignIdFor(SupplierOrder::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(SupplierListing::class)->nullable()->constrained()->cascadeOnDelete();
             $table->decimal('unit_weight', 7, 3)->nullable();
-            $table->decimal('quantity', 7, 2);
+            $table->decimal('quantity', 10, 3);
             $table->decimal('unit_price', 7, 2)->nullable();
+            $table->string('batch_number')->nullable();
+            $table->date('expiry_date')->nullable();
+            $table->boolean('is_in_supplies')->default(false);
             $table->softDeletes();
             $table->timestamps();
         });

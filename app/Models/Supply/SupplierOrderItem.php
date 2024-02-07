@@ -20,6 +20,12 @@ class SupplierOrderItem extends Model
 
     ];
 
+    protected $casts = [
+        'is_in_supplies' => 'boolean',
+    ];
+
+    
+
     public function supplier_order(): BelongsTo
     {
         return $this->belongsTo(SupplierOrder::class);

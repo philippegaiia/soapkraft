@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class SupplierOrder extends Model
 {
-    use HasFactory;
+    use HasFactory; 
 
     Use SoftDeletes;
 
@@ -35,5 +36,10 @@ class SupplierOrder extends Model
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function supplier_listings(): HasManyThrough
+    {
+        return $this->hasManyThrough(SupplierListing::class, SupplierOrderItem::class);
     }
 }

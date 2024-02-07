@@ -86,15 +86,17 @@ class SupplierListingResource extends Resource
                     ->searchable(),
                 
                 Tables\Columns\TextColumn::make('ingredient.name')
-                    ->numeric()
+                    //->numeric()
+                    ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('supplier.name')
                     ->numeric()
+                    ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('pkg')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('pkg'),
+
                 Tables\Columns\TextColumn::make('unit_weight')
                     ->numeric()
                     ->sortable(),
@@ -106,15 +108,12 @@ class SupplierListingResource extends Resource
                     ->sortable(),
                 Tables\Columns\IconColumn::make('fairtrade')
                     ->boolean()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('cosmos')
                     ->boolean()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('ecocert')
                     ->boolean()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),
