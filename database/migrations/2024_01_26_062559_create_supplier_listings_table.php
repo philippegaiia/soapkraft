@@ -21,14 +21,15 @@ return new class extends Migration
             $table->string('code')->nullable()->unique();
             $table->string('supplier_code')->nullable();
             $table->string('pkg')->nullable();
-            $table->decimal('unit_weight', 10,3)->nullable();
+            $table->decimal('unit_weight', 7,2)->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->boolean('organic')->default(true);
             $table->boolean('fairtrade')->default(false);
             $table->boolean('cosmos')->default(false);
             $table->boolean('ecocert')->default(false);
             $table->longText('description')->nullable();   
-            $table->boolean('is_active')->default(true);     
+            $table->boolean('is_active')->default(true);
+            $table->string('file_path')->nullable();     
             $table->softDeletes();
             $table->timestamps();
         });

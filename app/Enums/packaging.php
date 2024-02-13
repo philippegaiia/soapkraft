@@ -6,14 +6,14 @@ use Filament\Support\Contracts\HasLabel;
 
 enum Packaging: string implements HasLabel
 {
-    case Bidon = 'bidon';
-    case Seau = 'seau';
-    case Carton = 'carton';
-    case Fût = 'fût';
-    case Flacon = 'flacon';
-    case Unitaire  = 'unitaire';
-    case Vrac = 'vrac';
-    case Sac  = 'sac';
+    case Bidon = '1';
+    case Seau = '2';
+    case Carton = '3';
+    case Fût = '4';
+    case Flacon = '5';
+    case Unitaire  = '6';
+    case Vrac = '7';
+    case Sac  = '8';
 
     public function getLabel(): string
     // This is the method that will be called to get the label of the enum

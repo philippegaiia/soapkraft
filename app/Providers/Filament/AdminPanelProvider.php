@@ -7,6 +7,7 @@ use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Pages\Dashboard;
+use Filament\Pages\Auth\Login;
 use Filament\Support\Colors\Color;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
@@ -29,7 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->colors([
-                'primary' => Color::Teal,
+                'primary' => Color::Indigo,
                 'info' => Color::Slate,
                 'success' => Color::Lime,
                 'danger' => Color::Orange,
@@ -44,7 +45,7 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
-            //  ->databaseNotifications()
+            //->databaseNotifications()
             ->navigationGroups([
                 'Achats',
                 'Production',

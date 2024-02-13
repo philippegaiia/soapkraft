@@ -2,6 +2,7 @@
 
 namespace App\Models\Supply;
 
+use App\Enums\IsInSuppliesStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,7 +22,7 @@ class SupplierOrderItem extends Model
     ];
 
     protected $casts = [
-        'is_in_supplies' => 'boolean',
+     // 'is_in_supplies' => IsInSuppliesStatus::class,
     ];
 
     

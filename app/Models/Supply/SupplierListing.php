@@ -2,6 +2,7 @@
 
 namespace App\Models\Supply;
 
+use App\Enums\Packaging;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,6 +28,10 @@ class SupplierListing extends Model
         'is_active',
         'supplier_id',
         'ingredient_id'
+    ];
+
+    protected $casts = [
+        'pkg' => Packaging::class,
     ];
 
     public function ingredient()

@@ -16,13 +16,13 @@ return new class extends Migration
         Schema::create('supplier_order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(SupplierOrder::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(SupplierListing::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(SupplierListing::class)->constrained()->cascadeOnDelete();
             $table->decimal('unit_weight', 7, 3)->nullable();
             $table->decimal('quantity', 10, 3);
             $table->decimal('unit_price', 7, 2)->nullable();
             $table->string('batch_number')->nullable();
             $table->date('expiry_date')->nullable();
-            $table->boolean('is_in_supplies')->default(false);
+            $table->string('is_in_supplies');
             $table->softDeletes();
             $table->timestamps();
         });

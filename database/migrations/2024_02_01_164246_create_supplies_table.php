@@ -23,7 +23,9 @@ return new class extends Migration
             $table->decimal('quantity_in', 7, 2)->nullable();
             $table->decimal('quantity_out', 7, 2)->nullable();
             $table->decimal('unit_price', 7, 2)->nullable();
-            $table->date('expiration_date')->nullable();
+            $table->date('expiry_date')->nullable();
+            $table->date('delivery_date')->nullable();
+            $table->boolean('is_in_stock')->default(true);
             $table->softDeletes();
             $table->timestamps();
         });

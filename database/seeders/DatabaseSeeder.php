@@ -5,6 +5,9 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Production\Producttag;
+use phpDocumentor\Reflection\DocBlock\Tag;
+use Database\Seeders\ProductCategorySeeder;
 use Database\Seeders\SupplierListingSeeder;
 use Database\Seeders\Supply\SupplierSeeder;
 use Database\Seeders\Supply\IngredientSeeder;
@@ -55,11 +58,30 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
+        DB::table('producttags')->insert([
+            [
+                'name' => 'neutre',
+                'color' => '#000000',
+                
+            ],
+            [
+                'name' => 'neutre',
+                'color' => '#fafafa',
+            ],
+            [
+                'name' => 'neutre',
+                'color' => '#e8e8e8',
+            ],
+        ]);
+
+        
 
         $this->call(IngredientCategorySeeder::class);
         $this->call(IngredientSeeder::class);
         $this->call(SupplierListingSeeder::class);
-
+        $this->call(ProductCategorySeeder::class);
+        $this->call(ProductSeeder::class);
+        
 
         
     }

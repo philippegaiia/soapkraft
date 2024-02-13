@@ -22,12 +22,15 @@ class SupplierOrderItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'supplier_order_items';
 
-    public function getSupplierId(RelationManager $livewire): array {
+    public int $supplierId;
+    
+
+   /* public function getSupplierId(RelationManager $livewire): array {
                          return  $livewire->getOwnerRecord()->supplier()->pluck('supplier_id')->toArray();
                          dd($livewire->getOwnerRecord()->supplier()->pluck('supplier_id')->toArray());
                        // 
                         //->toArray();
-                        }
+                        } */
 
     public function form(Form $form): Form
     {

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Supplier::class)->constrained()->nullable();
             $table->unsignedSmallInteger('serial_number');
-            $table->string('order_status');
+            $table->unsignedTinyInteger('order_status');
             $table->string('order_ref')->nullable();
             $table->date('order_date')->default(now());
             $table->date('delivery_date')->nullable();
