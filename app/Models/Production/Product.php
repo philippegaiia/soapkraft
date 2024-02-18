@@ -24,4 +24,9 @@ class Product extends Model
     {
         return $this->belongsToMany(Producttag::class);
     }
+
+    public function formulas(): BelongsToMany
+    {
+        return $this->belongsToMany(Formula::class);
+    }
 }

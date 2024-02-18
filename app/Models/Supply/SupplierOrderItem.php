@@ -22,7 +22,8 @@ class SupplierOrderItem extends Model
     ];
 
     protected $casts = [
-     // 'is_in_supplies' => IsInSuppliesStatus::class,
+     //'is_in_supplies' => 'boolean',
+     'expiry_date' => 'date',
     ];
 
     

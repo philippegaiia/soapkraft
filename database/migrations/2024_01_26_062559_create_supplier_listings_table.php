@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('code')->nullable()->unique();
             $table->string('supplier_code')->nullable();
             $table->string('pkg')->nullable();
+            $table->string('unit_of_measure')->nullable()->default('kg');
             $table->decimal('unit_weight', 7,2)->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->boolean('organic')->default(true);

@@ -74,16 +74,23 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        
-
         $this->call(IngredientCategorySeeder::class);
         $this->call(IngredientSeeder::class);
         $this->call(SupplierListingSeeder::class);
         $this->call(ProductCategorySeeder::class);
-        $this->call(ProductSeeder::class);
-        
+        //$this->call(ProductSeeder::class);
+        $this->call(ProductsTableSeeder::class);
 
         
+        $this->call(SupplierOrdersTableSeeder::class);
+        $this->call(SupplierOrderItemsTableSeeder::class);
+        $this->call(SuppliesTableSeeder::class);
+        
+        
+        $this->call(FormulasTableSeeder::class);
+        $this->call(FormulaItemsTableSeeder::class);
+        $this->call(ProductProducttagTableSeeder::class);
+        $this->call(FormulaProductTableSeeder::class);
     }
 }
  

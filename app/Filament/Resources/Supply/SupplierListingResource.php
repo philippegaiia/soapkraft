@@ -2,15 +2,18 @@
 
 namespace App\Filament\Resources\Supply;
 
-use App\Enums\Packaging;
 use Filament\Forms;
 use Filament\Tables;
+use App\Enums\Packaging;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Supply\Supplier;
 use Filament\Resources\Resource;
 use App\Models\Supply\Ingredient;
+use Filament\Tables\Actions\ActionGroup;
 use App\Models\Supply\SupplierListing;
+use Filament\Support\Enums\FontWeight;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\Supply\SupplierListingResource\Pages;
@@ -53,8 +56,17 @@ class SupplierListingResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Select::make('pkg')
                     ->options(Packaging::class),
-                Forms\Components\TextInput::make('unit_weight')
-                    ->numeric(),
+                Forms\Components\Select::make('pkg')
+                    ->options(Packaging::class),
+                Forms\Components\Select::make('unit_of_measure')
+                    ->options([
+                        'kg' => 'kg',
+                        'g' => 'Gramme',
+                        'Unit' => 'Unité',
+                        'Meter' => 'Mètre',
+                        'Litre' => 'Litre',
+                    ])
+                    ->default('Kilo.'),
                 Forms\Components\TextInput::make('price')
                     ->numeric()
                     ->prefix('€'),
@@ -76,11 +88,15 @@ class SupplierListingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
+            //->deferLoading()
             ->columns([
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('designation')
-                    ->searchable(),
+                    ->formatStateUsing(fn ($record) => $record->name . ' ' .  $record->unit_weight . ' ' . $record->unit_of_measure)
+                    ->weight(FontWeight::Bold)
+                    ->searchable(['name', 'unit_of_measure']),
 
                 Tables\Columns\TextColumn::make('code')
                     ->searchable(),
@@ -95,15 +111,21 @@ class SupplierListingResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('pkg'),
+                Tables\Columns\TextColumn::make('pkg')
+                    ->label('Packaging')
+                    ->toggleable(isToggledHiddenByDefault: true),             
 
                 Tables\Columns\TextColumn::make('unit_weight')
-                    ->numeric()
-                    ->sortable(),
+                    ->label('Poids Unit.')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('price')
-                    ->money()
+                    ->label('Prix')
+                    ->money('EUR')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('organic')
+                    ->label('Bio')
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('fairtrade')
@@ -116,6 +138,7 @@ class SupplierListingResource extends Resource
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_active')
+                    ->label('Actif')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
@@ -134,7 +157,30 @@ class SupplierListingResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
+            ActionGroup::make([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\DeleteAction::make()
+                ->action(function ($data, $record) {
+                    if ($record->supplies()->count() > 0 || $record->supplier_order_items()->count() > 0) {
+                        Notification::make()
+                            ->danger()
+                            ->title('Opération Impossible')
+                            ->body('Cet ingrédient est référencé dans des commandes fournisseur et dans les stocks ingrédients.')
+                            ->send();
+
+                        return;
+                    }
+
+                    Notification::make()
+                        ->success()
+                        ->title('Fournisseur Supprimé')
+                        ->body('Ingrédient ' . $record->name. ' supprimé avec succès.')
+                        ->send();
+
+                    $record->delete();
+                }),
+            ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

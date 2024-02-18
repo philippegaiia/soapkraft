@@ -2,6 +2,7 @@
 
 namespace App\Models\Supply;
 
+use App\Models\Production\FormulaItem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -42,4 +43,9 @@ class Ingredient extends Model
     {
         return $this->hasMany(SupplierListing::class);
     }   
+
+    /*public function formula_items(): HasMany
+    {
+        return $this->hasMany(FormulaItem::class);
+    }*/
 }

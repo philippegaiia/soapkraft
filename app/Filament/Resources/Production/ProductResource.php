@@ -30,9 +30,13 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('code')
                     ->maxLength(255),
                 Forms\Components\Select::make('producttags')
-                ->relationship('producttags', 'name')
-                ->preload()
-                ->multiple(),
+                    ->relationship('producttags', 'name')
+                    ->preload()
+                    ->multiple(),
+                Forms\Components\Select::make('formulas')
+                    ->relationship('formulas', 'name')
+                    ->preload()
+                    ->multiple(),
                 Forms\Components\TextInput::make('wp_code')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('name')
@@ -51,7 +55,7 @@ class ProductResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\Toggle::make('is_active')
                     ->onColor('success')
-                    ->offColor('danger')
+                    ->offColor('warning')
                     ->required()
                     ,
             ]);
@@ -67,8 +71,11 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('product_category.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('producttags.name')
-                    ->badge()
-                    ->color('producttags.color'),
+                    ->badge(),
+                   // ->color('producttags.color'),
+                Tables\Columns\TextColumn::make('formulas.name')
+                ->badge(),
+                //->color('producttags.color'),"Color: {$record->color}"
                 Tables\Columns\TextColumn::make('code')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('wp_code')

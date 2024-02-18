@@ -36,10 +36,10 @@ enum OrderStatus: string implements HasLabel, HasColor
     public function getColor(): string | array | null
     {
         return match ($this) {
-            self::Draft => Color::Slate,
-            self::Passed => 'primary',
-            self::Confirmed => 'warning',
-            self::Delivered => 'success',
+            self::Draft => Color::Stone,
+            self::Passed => 'info',
+            self::Confirmed => 'primary',
+            self::Delivered => 'warning',
             self::Checked => 'success',
             self::Cancelled => 'danger',
         };

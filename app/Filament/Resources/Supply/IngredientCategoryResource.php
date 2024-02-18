@@ -16,6 +16,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use App\Models\Supply\IngredientCategory;
 use Illuminate\Database\Eloquent\Builder;
@@ -121,10 +122,25 @@ class IngredientCategoryResource extends Resource
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()->action(function ($data, $record) {
+                    if ($record->ingredients()->count() > 0 ) {
+                        Notification::make()
+                            ->danger()
+                            ->title('Opération Impossible')
+                            ->body('Supprimez les ingrédients liés à la catégorie' . $record->name . ' pour la supprimer.')
+                            ->send();
+                        return;
+                    }
 
-                ]),
-                
+                    Notification::make()
+                        ->success()
+                        ->title('Catégorie Supprimée')
+                        ->body('La catégorie ' . $record->name . ' a été supprimé avec succès.')
+                        ->send();
+
+                        $record->delete();
+                    }),
+                ]),              
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

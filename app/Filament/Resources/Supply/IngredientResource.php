@@ -2,16 +2,18 @@
 
 namespace App\Filament\Resources\Supply;
 
-use App\Filament\Resources\Supply\IngredientResource\Pages;
-use App\Filament\Resources\Supply\IngredientResource\RelationManagers;
-use App\Models\Supply\Ingredient;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Models\Supply\Ingredient;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\Supply\IngredientResource\Pages;
+use App\Filament\Resources\Supply\IngredientResource\RelationManagers;
 
 class IngredientResource extends Resource
 {
@@ -108,7 +110,29 @@ class IngredientResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+            ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make()->action(function ($data, $record) {
+                    if ($record->supplier_listings()->count() > 0) {
+                        Notification::make()
+                            ->danger()
+                            ->title('Opération Impossible')
+                            ->body('Supprimez les ingrédients référencés liés à l\'ingrédient' . $record->name . ' pour le supprimer.')
+                            ->send();
+                        return;
+                    }
+
+                    Notification::make()
+                        ->success()
+                        ->title('Ingrédient Supprimé')
+                        ->body('L\'ingrédient'  . $record->name . ' a été supprimé avec succès.')
+                        ->send();
+
+                    $record->delete();
+                }),
+
+            ]),
+                
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
