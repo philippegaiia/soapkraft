@@ -41,7 +41,7 @@ class SupplierOrderResource extends Resource
 
     protected static ?string $navigationLabel = 'Commandes fournisseurs';
 
-    protected static ?string $navigationIcon = 'heroicon-o-book-open';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?int $navigationSort = 1;
 
@@ -219,6 +219,7 @@ class SupplierOrderResource extends Resource
                                         ->color('danger');
                                 }
                             )
+                            ->addAction(fn(Action $action) => $action->label('Ajouter')->icon('heroicon-m-plus')->color('success'))
                             ->extraItemActions([
                                 Action::make('createNewInventory')                                       
                                     ->label('Créer Stock')
@@ -235,7 +236,7 @@ class SupplierOrderResource extends Resource
                                 // ->after(function ($livewire) {
                                 //      $livewire->dispatch('refreshIsInSupplies');
                                 //  })
-                                    ->action(function (array $arguments, Repeater $component, $record, $state): void {
+                                    ->action(function (array $arguments, Repeater $component, $record, Set $set): void {
                                         $itemData = $component->getItemState($arguments['item']);
                                         //dd($state);
                                         if (!isset($record->id) || !isset($component->getRawItemState($arguments['item'])['id'])){                   
@@ -276,11 +277,14 @@ class SupplierOrderResource extends Resource
                                             $isInSupplies->is_in_supplies = 'Stock';
                                             $isInSupplies->save();
 
+
                                             Notification::make()
                                                 ->title('Entrée en Stock mise à jour de' . $isInSupplies->supplier_listing->name)
                                                 ->success()
+                                
                                                 ->send();
-
+                                            //dd($component->getRawItemState($arguments['item'])['is_in_supplies']); 
+                                            //dd($state['record-16']['is_in_supplies']);
                                             $unit_price = $itemData['unit_price'];
                                             $supplyId = $component->getRawItemState($arguments['item'])['supplier_listing_id'];
                                             $supplierListing = SupplierListing::findOrFail($supplyId);
@@ -291,10 +295,11 @@ class SupplierOrderResource extends Resource
                                             ->title('Prix mis à jour de' . $supplierListing->name)
                                             ->success()
                                             ->send();
-                                            
                                         }
-                                    })->successRedirectUrl(SupplierOrderResource::getUrl())
-                                        //])                                    
+                                    })
+                                    //successRedirectUrl(SupplierOrderResource::getUrl())
+                                        //])                         
+                                               
                                 ])->columnSpanFull()
                             ])
             ]);
@@ -407,5 +412,5 @@ class SupplierOrderResource extends Resource
         return $this->getResource()::getUrl('edit');
     }
 
-    protected $listeners = ['refreshIsInSupplies' => '$refresh'];
+    //protected $listeners = ['refreshIsInSupplies' => '$refresh'];
 }

@@ -23,7 +23,7 @@ class IngredientResource extends Resource
 
     protected static ?string $navigationLabel = 'Ingrédients';
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static ?string $navigationIcon = 'heroicon-m-square-3-stack-3d';
 
     protected static ?int $navigationSort = 3;
 

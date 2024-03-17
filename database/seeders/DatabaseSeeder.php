@@ -90,7 +90,7 @@ class DatabaseSeeder extends Seeder
         $this->call(FormulasTableSeeder::class);
         $this->call(FormulaItemsTableSeeder::class);
         $this->call(ProductProducttagTableSeeder::class);
-        $this->call(FormulaProductTableSeeder::class);
+        //$this->call(FormulaProductTableSeeder::class);
     }
 }
  

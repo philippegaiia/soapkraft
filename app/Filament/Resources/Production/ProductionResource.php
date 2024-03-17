@@ -4,13 +4,20 @@ namespace App\Filament\Resources\Production;
 
 use Filament\Forms;
 use Filament\Tables;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Enums\ProductionStatus;
 use Filament\Resources\Resource;
+use App\Models\Production\Formula;
 use App\Models\Production\Product;
 use App\Models\Production\Production;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\ToggleButtons;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\Production\ProductionResource\Pages;
 use App\Filament\Resources\Production\ProductionResource\RelationManagers;
@@ -18,6 +25,11 @@ use App\Filament\Resources\Production\ProductionResource\RelationManagers;
 class ProductionResource extends Resource
 {
     protected static ?string $model = Production::class;
+
+    protected static ?string $navigationGroup = 'Production';
+
+    protected static ?string $navigationLabel = 'Production';
+
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -30,13 +42,37 @@ class ProductionResource extends Resource
                     ->native(false)
                     ->searchable()
                     ->preload()
+                    ->live()
+                    ->afterStateUpdated(function (Set $set, Get $get, ?string $state) {
+                        $prodId = $get('product_id');
+                    //    dd((int)$prodId);
+                    //    $product = Product::find(1)->get(); 
+                        $formula = Product::find((int)$prodId)->formulas()
+                        //->where('is_active', true)
+                        ->first();
+
+                        if ($formula) {
+                            $formulaId = $formula->id;
+                            $set('formula_id', $formulaId);
+                        }
+                      //  $formula = Product::find(1)->formula;
+                       // dd($formula);
+                    })
                     ->required(),
-                Forms\Components\Select::make('formulas')
-                    ->relationship('formulas', 'name')
+                Forms\Components\Select::make('formula_id')
+                    ->relationship('formula', 'name')
+                    ->disabled()
+                    ->dehydrated()
                     ->required(),
                 Forms\Components\Select::make('parent_id')
+                    ->label('Masterbatch')
                     ->relationship('parent', 'id'),
-                Forms\Components\Toggle::make('is_masterbatch')
+                Forms\Components\ToggleButtons::make('is_masterbatch')
+                    ->label('Masterbatch')
+                    ->inline(false)
+                    ->default(false)
+                    ->boolean()
+                    ->grouped()
                     ->required(),
                 Forms\Components\TextInput::make('slug')
                     ->maxLength(255),
@@ -48,12 +84,18 @@ class ProductionResource extends Resource
                     ->inline()
                     ->required()
                     ->default(ProductionStatus::Planned),
-                Forms\Components\DatePicker::make('production_date')
-                    ->required()
-                    ->native(false),
-                Forms\Components\DatePicker::make('ready_date')
-                    ->required()
-                    ->native(false),
+                Forms\Components\Fieldset::make('Dates')
+                    ->schema([
+                        Forms\Components\DatePicker::make('production_date')
+                            ->required()
+                            ->default(now())
+                            ->native(false)
+                            ->weekStartsOnMonday(),
+                        Forms\Components\DatePicker::make('ready_date')
+                            ->afterOrEqual('production_date')
+                            ->native(false)
+                            ->weekStartsOnMonday()
+                ])->columnSpanFull(),
                 Forms\Components\TextInput::make('quantity_ingredients')
                     ->numeric(),
                 Forms\Components\TextInput::make('units_produced')

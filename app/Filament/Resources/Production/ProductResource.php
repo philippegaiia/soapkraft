@@ -2,20 +2,25 @@
 
 namespace App\Filament\Resources\Production;
 
-use App\Filament\Resources\Production\ProductResource\Pages;
-use App\Filament\Resources\Production\ProductResource\RelationManagers;
-use App\Models\Production\Product;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Models\Production\Formula;
+use App\Models\Production\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\Production\ProductResource\Pages;
+use App\Filament\Resources\Production\ProductResource\RelationManagers;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
+
+    protected static ?string $navigationGroup = 'Produits';
+
+    protected static ?string $navigationLabel = 'Produits';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -27,21 +32,24 @@ class ProductResource extends Resource
                     ->relationship('product_category', 'name')
                     ->native(false)
                     ->required(),
+                    
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('code')
                     ->maxLength(255),
                 Forms\Components\Select::make('producttags')
                     ->relationship('producttags', 'name')
                     ->preload()
                     ->multiple(),
-                Forms\Components\Select::make('formulas')
-                    ->relationship('formulas', 'name')
+             /*   Forms\Components\Select::make('formula_id')
+                   // ->relationship('formulas', 'name')
+                    ->options(Formula::all()->pluck('name', 'id'))
                     ->preload()
-                    ->multiple(),
+                    ->required(),*/
                 Forms\Components\TextInput::make('wp_code')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
+                
                 Forms\Components\DatePicker::make('launch_date')
                     ->native(false)    
                     ->required(),

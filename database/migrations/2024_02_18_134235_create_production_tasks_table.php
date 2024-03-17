@@ -22,6 +22,7 @@ return new class extends Migration
             $table->date('date')->default(now());  
             $table->mediumText('notes')->nullable(); 
             $table->boolean('is_finished')->default(false);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

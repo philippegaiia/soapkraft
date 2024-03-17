@@ -17,7 +17,11 @@ class ProductionTaskTypeResource extends Resource
 {
     protected static ?string $model = ProductionTaskType::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Production';
+
+    protected static ?string $navigationLabel = 'Types de tâches';
+
+    protected static ?string $navigationIcon = 'heroicon-o-adjustments-vertical';
 
     public static function form(Form $form): Form
     {

@@ -19,8 +19,11 @@ use App\Filament\Resources\Production\ProducttagResource\RelationManagers;
 class ProducttagResource extends Resource
 {
     protected static ?string $model = Producttag::class;
+    protected static ?string $navigationGroup = 'Produits';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Tags';
+
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     public static function form(Form $form): Form
     {

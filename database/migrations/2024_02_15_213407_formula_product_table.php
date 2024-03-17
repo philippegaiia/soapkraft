@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('formula_product', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Formula::class)->constrained();
-            $table->foreignIdFor(Product::class)->constrained();
+           // $table->foreignIdFor(Formula::class)->constrained();
+           // $table->foreignIdFor(Product::class)->constrained();
             $table->softDeletes();
             $table->timestamps();
         });

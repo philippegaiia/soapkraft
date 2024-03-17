@@ -17,7 +17,12 @@ class ProductionTaskResource extends Resource
 {
     protected static ?string $model = ProductionTask::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Production';
+
+    protected static ?string $navigationLabel = 'Tâches';
+
+
+    protected static ?string $navigationIcon = 'heroicon-c-check';
 
     public static function form(Form $form): Form
     {

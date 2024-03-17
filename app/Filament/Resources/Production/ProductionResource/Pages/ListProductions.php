@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\Production\ProductionResource\Pages;
 
-use App\Filament\Resources\Production\ProductionResource;
 use Filament\Actions;
+use App\Models\Production\Production;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Production\ProductionResource;
 
 class ListProductions extends ListRecords
 {
@@ -13,7 +14,10 @@ class ListProductions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+          /*  ->after(function (Production $record){
+                dd($record);
+            })*/,
         ];
     }
 }

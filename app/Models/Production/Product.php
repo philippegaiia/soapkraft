@@ -4,6 +4,8 @@ namespace App\Models\Production;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,13 +22,13 @@ class Product extends Model
         return $this->belongsTo(ProductCategory::class);
     }
 
-    public function producttags(): BelongsToMany
+  public function producttags(): BelongsToMany
     {
         return $this->belongsToMany(Producttag::class);
     }
 
-    public function formulas(): BelongsToMany
+    public function formulas(): HasMany
     {
-        return $this->belongsToMany(Formula::class);
+        return $this->hasMany(Formula::class);
     }
 }

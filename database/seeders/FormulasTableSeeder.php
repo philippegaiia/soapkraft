@@ -24,6 +24,7 @@ class FormulasTableSeeder extends Seeder
             array (
                 'id' => 1,
                 'name' => 'Savon Très Doux',
+                'product_id' => 1,
                 'slug' => NULL,
                 'code' => 'GA001',
                 'dip_number' => 'GA001',
@@ -38,6 +39,7 @@ class FormulasTableSeeder extends Seeder
             array (
                 'id' => 2,
                 'name' => 'Intuitif',
+                'product_id' => 19,
                 'slug' => NULL,
                 'code' => 'GA011',
                 'dip_number' => 'GA011',

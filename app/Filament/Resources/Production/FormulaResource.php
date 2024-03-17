@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use App\Models\Supply\Ingredient;
 use App\Models\Production\Formula;
+use App\Models\Production\Product;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
@@ -29,7 +30,12 @@ class FormulaResource extends Resource
 {
     protected static ?string $model = Formula::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Produits';
+
+    protected static ?string $navigationLabel = 'Formules';
+
+
+    protected static ?string $navigationIcon = 'heroicon-o-beaker';
 
     public static function form(Form $form): Form
     {
@@ -47,6 +53,13 @@ class FormulaResource extends Resource
                             ->disabledOn('edit')
                             ->unique(Formula::class, ignoreRecord: true)
                             ->required(fn (string $operation): bool => $operation === 'create'),
+
+                        Select::make('product_id')
+                            ->relationship('product', 'name')
+                            ->options(Product::all()->pluck('name', 'id'))
+                            ->preload()
+                            ->searchable()
+                            ->required(),
 
                         TextInput::make('dip_number')
                             ->maxLength(50),
@@ -73,7 +86,41 @@ class FormulaResource extends Resource
 
                 ])->columns(4),
                 //  ]);
+Section::make()
+                ->hiddenOn('create')
+                ->columns(1)
+                ->maxWidth('1/2')
+                ->schema([
+                    Fieldset::make('Totaux')
+                    ->schema([
+                            Forms\Components\Placeholder::make('total_saponified')
+                                ->content(function ($get)
+                                {
+                                    $total = 0;
+                                    
+                                    foreach ($get('formula_items') as $item) {
+                                        if ($item['phase'] === Phases::Saponification->value){
+                                            $total += (int)$item['percentage_of_oils'];
+                                        }
+                                        
+                                    }
+                                    return $total;
+                                }),
 
+                            Forms\Components\Placeholder::make('total_formula')
+                                ->content(function ($get) {
+                                    $total = 0;
+                                    foreach ($get('formula_items') as $item) {
+                                        //dd($total);
+                                        $total += (int)$item['percentage_of_oils'];
+                                         
+                                    }
+                                    if ($total !== 0) {
+                                    $totalformula = 100 / $total;
+                                    return $totalformula;
+                                    }
+                                })
+                            ]),
                 Section::make('Items Formule')
                     ->schema([
                         Forms\Components\Repeater::make('formula_items')
@@ -101,7 +148,9 @@ class FormulaResource extends Resource
                                     ->numeric()
                                     ->live()
                                     ->dehydrated()
-                                    //->afterStateUpdated(fn (Set $set, $state) => $set('percentage_of_total', $state))
+                                    ->afterStateUpdated(function (Set $set, $state) {
+                                        $set('percentage_of_total', 'percentage_of_oils');
+                                    })                                 
                                     ->default(1)
                                     ->columnSpan(3),
 
@@ -120,47 +169,19 @@ class FormulaResource extends Resource
 
                                 Placeholder::make('percentage_of_total')
                                     ->label('Total')
-                                    //->dehydrated()
-                                   ->content(function ($get) {
-                                    return $get('percentage_or_oils') ;
-                                   })
+                        //->dehydrated()
+                                    ->content(function (Get $get): string {
+                                        return number_format($get('percentage_of_oils') , 2);
+                                        })
                                     ->live(),
 
                         ])->columns(18)
                         ->defaultItems(1)
-                ->reorderableWithButtons()
+                        ->reorderableWithButtons()
                         ->orderColumn('sort')
                         ->live()                  
                                 ]),
-            Section::make()
-                ->columns(1)
-                ->maxWidth('1/2')
-                ->schema([
-                    Fieldset::make('Totaux')
-                    ->schema([
-                            Forms\Components\Placeholder::make('Total Saponifié')
-                                ->content(function ($get)
-                                {
-                                    $total = 0;
-                                    
-                                    foreach ($get('formula_items') as $item) {
-                                        if ($item['phase'] === Phases::Saponification->value){
-                                            $total += $item['percentage_of_oils'];
-                                        }
-                                        
-                                    }
-                                    return $total;
-                                }),
-
-                            Forms\Components\Placeholder::make('Total')
-                                ->content(function ($get) {
-                                    $total = 0;
-                                    foreach ($get('formula_items') as $item) {
-                                        $total += $item['percentage_of_total'];
-                                    }
-                                    return $total;
-                                }) 
-                    ])
+            
                     
                         
                         // Read-only, because it's calculated

@@ -43,5 +43,9 @@ class Production extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    public function formula(): BelongsTo
+    {
+        return $this->belongsTo(Formula::class);
+    }
 }
  
